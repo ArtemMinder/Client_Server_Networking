@@ -4,6 +4,7 @@
 #include "ILogger.h"
 #include "ISynchronization.h"
 #include "IBuffer.h"
+#include "IEncryptor.h"
 #include <boost/asio.hpp>
 
 class Server 
@@ -21,4 +22,5 @@ private:
     std::shared_ptr<ILogger> logger_;
     std::shared_ptr<ISynchronization> sync_;
     std::shared_ptr<IBuffer> buffer_;
+    std::shared_ptr<IEncryptor> decryptor_;
 };

@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <string>
 #include <vector>
+#include "IEncryptor.h"
 
 class Client 
 {
@@ -18,4 +19,5 @@ private:
     std::shared_ptr<ILogger> logger_;
     std::shared_ptr<ISynchronization> sync_;
     std::shared_ptr<IBuffer> buffer_;
+    std::shared_ptr<IEncryptor> encryptor_;
 };

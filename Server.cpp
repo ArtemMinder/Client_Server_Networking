@@ -1,6 +1,7 @@
 #include "Server.h"
 #include <iostream>
 #include <array>
+#include "AESEncryptor.h"
 #include <thread>
 
 Server::Server(boost::asio::io_context& io_context, short port,
@@ -10,6 +11,7 @@ Server::Server(boost::asio::io_context& io_context, short port,
     fileHandler_(storageDir), logger_(logger), sync_(sync), buffer_(buffer)
 {
   doAccept();
+  decryptor_ = std::make_shared<AESEncryptor>();
 }
 
 void Server::doAccept() 
@@ -43,7 +45,8 @@ void Server::handleRequest(boost::asio::ip::tcp::socket socket)
 
         std::string uniqueFilename = fileHandler_.generateUniqueFilename(filename, clientID);
 
-        auto fileData = buffer_->read();
+        auto fileData = decryptor_->decrypt(buffer_->read());
+
         while ((len = socket.read_some(boost::asio::buffer(bufferArray), error)) > 0)
         {
             fileData.insert(fileData.end(), bufferArray.data(), bufferArray.data() + len);

@@ -1,5 +1,6 @@
 #include "Client.h"
 #include <fstream>
+#include "AESEncryptor.h"
 #include <iostream>
 
 Client::Client(boost::asio::io_context& io_context, const std::string& server,
@@ -10,6 +11,7 @@ Client::Client(boost::asio::io_context& io_context, const std::string& server,
     boost::asio::ip::tcp::resolver resolver(io_context);
     auto endpoints = resolver.resolve(server, std::to_string(port));
     boost::asio::connect(socket_, endpoints);
+    encryptor_ = std::make_shared<AESEncryptor>();
 }
 
 void Client::sendFile(const std::string& clientID, const std::string& filePath)
@@ -30,7 +32,9 @@ void Client::sendFile(const std::string& clientID, const std::string& filePath)
         }
 
         std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-        buffer_->write(buffer);
+        auto encryptedData = encryptor_->encrypt(buffer);
+        buffer_->write(encryptedData);
+
         auto fileData = buffer_->read();
 
         boost::asio::write(socket_, boost::asio::buffer(fileData.data(), fileData.size()));
